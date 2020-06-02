@@ -13,6 +13,7 @@
   },
   "scripts": {
     "emulator": "firebase emulators:start",
+    "deploy": "yarn build && firebase deploy",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject"
