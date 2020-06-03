@@ -7,6 +7,7 @@
     "@material-ui/icons": "^4.9.1",
     "firebase": "^7.14.6",
     "react": "^16.13.1",
+    "react-canvas-draw": "^1.1.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
     "reactfire": "^2.0.3"
