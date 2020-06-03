@@ -1,11 +1,10 @@
 import React from "react";
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import AuthForm from './AuthForm';
-import WhatshotIcon from '@material-ui/icons/Whatshot';
-
+import { makeStyles } from "@material-ui/core/styles";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import AuthForm from "./AuthForm";
+import WhatshotIcon from "@material-ui/icons/Whatshot";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,9 +23,8 @@ export default function NavBar() {
   return (
     <AppBar position="static">
       <Toolbar>
-      <WhatshotIcon />
         <Typography variant="h6" className={classes.title}>
-        First Week Project
+          Whiteboard on Fire <WhatshotIcon />
         </Typography>
         <AuthForm />
       </Toolbar>
