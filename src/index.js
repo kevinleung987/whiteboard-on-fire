@@ -1,14 +1,17 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import "./index.css";
-import App from "./components/App";
-import * as serviceWorker from "./serviceWorker";
-import { FirebaseAppProvider, SuspenseWithPerf } from "reactfire";
-import { firebaseConfig } from "./config/firebaseConfig";
+import './index.css';
+
+import CircularProgress from '@material-ui/core/CircularProgress';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { FirebaseAppProvider, SuspenseWithPerf } from 'reactfire';
+
+import App from './components/App';
+import { firebaseConfig } from './config/firebaseConfig';
+import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <FirebaseAppProvider firebaseConfig={firebaseConfig}>
-    <SuspenseWithPerf fallback={<p>loading firebase...</p>}>
+    <SuspenseWithPerf fallback={<CircularProgress />}>
       <React.StrictMode>
         <App />
       </React.StrictMode>

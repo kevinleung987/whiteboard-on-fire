@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import CanvasDraw from "react-canvas-draw";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
+import { Button, Container } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   canvas: {
@@ -18,20 +19,34 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Canvas() {
   const classes = useStyles();
+  const ref = React.useRef();
   return (
     <>
       <Paper className={classes.canvas} elevation={3}>
-        <CanvasDraw canvasWidth={"100%"} canvasHeight={"100%"} />
+        <CanvasDraw
+          ref={ref}
+          canvasWidth={"100%"}
+          canvasHeight={"100%"}
+          onChange={(change) => console.log(change)}
+        />
       </Paper>
       <Paper className={classes.options} elevation={3}>
-        <Grid container spacing={3}>
-          <Grid item xs={2}>
-            Red
+        <Container>
+          <Grid container spacing={3}>
+            <Grid item xs={2}>
+              <Button
+                onClick={() =>
+                  console.log(JSON.parse(ref.current.getSaveData()))
+                }
+              >
+                DEBUG
+              </Button>
+            </Grid>
+            <Grid item xs={2}>
+              <Button onClick={() => ref.current.clear()}>CLEAR</Button>
+            </Grid>
           </Grid>
-          <Grid item xs={2}>
-            Blue
-          </Grid>
-        </Grid>
+        </Container>
       </Paper>
     </>
   );
