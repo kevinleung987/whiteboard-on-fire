@@ -7,7 +7,7 @@ import { Button, Container } from "@material-ui/core";
 import clsx from "clsx";
 
 const colors = {
-  black: '#444',
+  black: "#444",
   red: "#f44336",
   pink: "#e91e63",
   purple: "#9c27b0",
@@ -32,12 +32,11 @@ const colors = {
 const styles = {
   canvas: {
     width: "100%",
-    height: "90%",
+    height: "100%",
   },
   options: {
     marginTop: 16,
     width: "100%",
-    // height: "10%",
   },
   circle: {
     width: 40,
@@ -45,6 +44,8 @@ const styles = {
     borderRadius: "50%",
   },
 };
+
+const thicknesses = [2, 4, 8, 12];
 
 Object.keys(colors).forEach((color) => {
   const colorCode = colors[color];
@@ -57,6 +58,7 @@ export default function Canvas() {
   const classes = useStyles();
   const ref = React.useRef();
   const [brushColor, setColor] = React.useState(colors.black);
+  const [brushThickness, setBrushThickness] = React.useState(12);
   return (
     <>
       <Paper className={classes.canvas} elevation={3}>
@@ -65,6 +67,7 @@ export default function Canvas() {
           canvasWidth={"100%"}
           canvasHeight={"100%"}
           brushColor={brushColor}
+          brushRadius={brushThickness}
           onChange={(change) => console.log(change)}
         />
       </Paper>
@@ -73,10 +76,29 @@ export default function Canvas() {
           <Grid container spacing={3}>
             {Object.keys(colors).map((color) => {
               return (
-                <Grid item xs={1}>
+                <Grid item key={color} xs={1}>
                   <div
                     className={clsx(classes.circle, classes[color])}
                     onClick={() => setColor(colors[color])}
+                  ></div>
+                </Grid>
+              );
+            })}
+            {thicknesses.map((thickness) => {
+              return (
+                <Grid
+                  item
+                  key={thickness}
+                  xs={1}
+                  onClick={() => setBrushThickness(thickness)}
+                >
+                  <div
+                    style={{
+                      borderRadius: "50%",
+                      height: thickness * 3,
+                      width: thickness * 3,
+                      backgroundColor: brushColor,
+                    }}
                   ></div>
                 </Grid>
               );
