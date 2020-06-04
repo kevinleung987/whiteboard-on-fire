@@ -14,7 +14,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AuthForm() {
+export default function AuthForm(props) {
   const auth = useAuth();
   const user = useUser();
   const [open, setOpen] = React.useState(false);
@@ -31,11 +31,13 @@ export default function AuthForm() {
   const handleSubmit = async (name) => {
     await auth.signInAnonymously();
     await auth.currentUser.updateProfile({ displayName: name || "" });
+    props.authFunc(true);
     console.log(auth.currentUser);
     setOpen(false);
   };
 
   const handleSignout = () => {
+    props.authFunc(false);
     auth.signOut();
   };
 

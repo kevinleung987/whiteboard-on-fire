@@ -13,6 +13,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import React from "react";
 import { useDatabase, useDatabaseList, useUser } from "reactfire";
+import { currentBoard } from "./../utils/firebaseUtils";
+import Presence from './Presence';
 
 const useStyles = makeStyles((theme) => ({
   chat: {
@@ -25,7 +27,8 @@ const useStyles = makeStyles((theme) => ({
 export default function Chat() {
   const handleChange = (event) => {
     setMessage(event.target.value);
-  }
+  };
+
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
       sendMessage(event.target.value);
@@ -33,31 +36,32 @@ export default function Chat() {
   };
 
   const sendMessage = (message) => {
-    ref.push({
+    messagesRef.push({
       content: message,
       timestamp: Date.now(),
       author: user.displayName,
     });
-    setMessage('');
+    setMessage("");
   };
 
   const classes = useStyles();
   const messagesBottomRef = React.useRef();
   const user = useUser();
   const db = useDatabase();
-  const ref = db.ref("boards/example/messages");
-  const changes = useDatabaseList(ref);
+  const messagesRef = db.ref(`boards/${currentBoard()}/messages`);
+  const messageChanges = useDatabaseList(messagesRef);
   const [message, setMessage] = React.useState("");
   React.useEffect(
     () => messagesBottomRef.current.scrollIntoView({ behavior: "smooth" }),
-    [changes]
+    [messageChanges]
   );
 
   return (
     <div>
+      <Presence />
       <Paper className={classes.chat} elevation={3}>
         <List>
-          {changes.map(({ snapshot }) => {
+          {messageChanges.map(({ snapshot }) => {
             const { content, timestamp, author } = snapshot.val();
             const date = new Date(timestamp).toLocaleTimeString();
 

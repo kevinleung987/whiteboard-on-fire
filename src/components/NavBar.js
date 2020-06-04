@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function NavBar() {
+export default function NavBar(props) {
   const classes = useStyles();
   return (
     <AppBar position="static">
@@ -26,7 +26,7 @@ export default function NavBar() {
         <Typography variant="h6" className={classes.title}>
           Whiteboard on Fire <WhatshotIcon />
         </Typography>
-        <AuthForm />
+        <AuthForm authFunc={props.authFunc}/>
       </Toolbar>
     </AppBar>
   );

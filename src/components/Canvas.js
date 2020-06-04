@@ -32,7 +32,7 @@ const colors = {
 const styles = {
   canvas: {
     width: "100%",
-    height: "100%",
+    height: "60vh",
   },
   options: {
     marginTop: 16,
@@ -105,15 +105,47 @@ export default function Canvas() {
             })}
             <Grid item xs={2}>
               <Button
+                variant="contained"
+                color="default"
+                fullWidth={true}
+                onClick={() =>
+                  console.log(ref.current.lazy.getPointerCoordinates())
+                }
+              >
+                DEBUG:POINTER
+              </Button>
+            </Grid>
+            <Grid item xs={2}>
+              <Button
+                variant="contained"
+                color="default"
+                fullWidth={true}
                 onClick={() =>
                   console.log(JSON.parse(ref.current.getSaveData()))
                 }
               >
-                DEBUG
+                DEBUG:SAVE
               </Button>
             </Grid>
             <Grid item xs={2}>
-              <Button onClick={() => ref.current.clear()}>CLEAR</Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                fullWidth={true}
+                onClick={() => ref.current.undo()}
+              >
+                Undo
+              </Button>
+            </Grid>
+            <Grid item xs={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth={true}
+                onClick={() => ref.current.clear()}
+              >
+                Clear
+              </Button>
             </Grid>
           </Grid>
         </Container>
