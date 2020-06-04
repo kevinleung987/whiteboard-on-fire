@@ -4,8 +4,32 @@ import CanvasDraw from "react-canvas-draw";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import { Button, Container } from "@material-ui/core";
+import clsx from "clsx";
 
-const useStyles = makeStyles((theme) => ({
+const colors = {
+  black: '#444',
+  red: "#f44336",
+  pink: "#e91e63",
+  purple: "#9c27b0",
+  deepPurple: "#673ab7",
+  indigo: "#3f51b5",
+  blue: "#2196f3",
+  lightBlue: "#03a9f4",
+  cyan: "#00bcd4",
+  teal: "#009688",
+  green: "#4caf50",
+  lightGreen: "#8bc34a",
+  lime: "#cddc39",
+  yellow: "#ffeb3b",
+  amber: "#ffc107",
+  orange: "#ff9800",
+  deepOrange: "#ff5722",
+  brown: "#795548",
+  grey: "#9e9e9e",
+  blueGrey: "#607d8b",
+};
+
+const styles = {
   canvas: {
     width: "100%",
     height: "90%",
@@ -13,13 +37,26 @@ const useStyles = makeStyles((theme) => ({
   options: {
     marginTop: 16,
     width: "100%",
-    height: "10%",
+    // height: "10%",
   },
-}));
+  circle: {
+    width: 40,
+    height: 40,
+    borderRadius: "50%",
+  },
+};
+
+Object.keys(colors).forEach((color) => {
+  const colorCode = colors[color];
+  styles[color] = { backgroundColor: colorCode };
+});
+
+const useStyles = makeStyles((theme) => ({ ...styles }));
 
 export default function Canvas() {
   const classes = useStyles();
   const ref = React.useRef();
+  const [brushColor, setColor] = React.useState(colors.black);
   return (
     <>
       <Paper className={classes.canvas} elevation={3}>
@@ -27,12 +64,23 @@ export default function Canvas() {
           ref={ref}
           canvasWidth={"100%"}
           canvasHeight={"100%"}
+          brushColor={brushColor}
           onChange={(change) => console.log(change)}
         />
       </Paper>
       <Paper className={classes.options} elevation={3}>
         <Container>
           <Grid container spacing={3}>
+            {Object.keys(colors).map((color) => {
+              return (
+                <Grid item xs={1}>
+                  <div
+                    className={clsx(classes.circle, classes[color])}
+                    onClick={() => setColor(colors[color])}
+                  ></div>
+                </Grid>
+              );
+            })}
             <Grid item xs={2}>
               <Button
                 onClick={() =>

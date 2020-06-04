@@ -19,12 +19,12 @@ function App() {
       <NavBar />
       <div className={classes.spacer} />
       {user ? (
-        <Container maxWidth="lg">
-          <Grid container spacing={3}>
-            <Grid item xs={8}>
+        <Container>
+          <Grid container spacing={2}>
+            <Grid item xs={9}>
               <Canvas />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={3}>
               <Chat />
             </Grid>
           </Grid>
