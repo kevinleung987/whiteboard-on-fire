@@ -1,42 +1,20 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import CanvasDraw from "react-canvas-draw";
 import {
   Button,
   Container,
-  Switch,
   FormControlLabel,
-  Paper,
   Grid,
+  Paper,
+  Switch,
 } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
-import UndoIcon from "@material-ui/icons/Undo";
 import clsx from "clsx";
-import { useDatabase, useDatabaseList } from "reactfire";
-import { currentBoard } from "./../utils/firebaseUtils";
+import React from "react";
+import CanvasDraw from "react-canvas-draw";
+import { useDatabase } from "reactfire";
 
-const colors = {
-  black: "#444",
-  red: "#f44336",
-  pink: "#e91e63",
-  purple: "#9c27b0",
-  deepPurple: "#673ab7",
-  indigo: "#3f51b5",
-  blue: "#2196f3",
-  lightBlue: "#03a9f4",
-  cyan: "#00bcd4",
-  teal: "#009688",
-  green: "#4caf50",
-  lightGreen: "#8bc34a",
-  lime: "#cddc39",
-  yellow: "#ffeb3b",
-  amber: "#ffc107",
-  orange: "#ff9800",
-  deepOrange: "#ff5722",
-  brown: "#795548",
-  grey: "#9e9e9e",
-  blueGrey: "#607d8b",
-};
+import { colors } from "./../utils/constants";
+import { currentBoard } from "./../utils/firebaseUtils";
 
 const styles = {
   canvas: {
@@ -64,11 +42,42 @@ Object.keys(colors).forEach((color) => {
 const useStyles = makeStyles((theme) => ({ ...styles }));
 
 export default function Canvas() {
+  const classes = useStyles();
+
+  // State variables
+  const ref = React.useRef();
+  const [brushColor, setColor] = React.useState(colors.black);
+  const [brushThickness, setBrushThickness] = React.useState(2);
+  const [lazyBrushEnabled, setLazyBrushEnabled] = React.useState(false);
+  let updated = false;
+
+  // RTDB Interaction
+  const db = useDatabase();
+  const linesRef = db.ref(`boards/${currentBoard()}/lines`);
+  linesRef.off();
+  linesRef.on("child_added", (snapshot) => {
+    if (updated === true) {
+      updated = false;
+      return;
+    }
+    const newLine = snapshot.val();
+    if (ref.current) {
+      updated = false;
+      ref.current.drawPoints(newLine);
+      ref.current.points = newLine.points;
+      ref.current.saveLine({
+        brushColor: newLine.brushColor,
+        brushRadius: newLine.brushRadius,
+      });
+    }
+  });
+  linesRef.on("child_removed", (snapshot) => {
+    ref.current.clear();
+  });
   const sendUpdate = () => {
     const parsed = JSON.parse(ref.current.getSaveData());
     if (parsed.lines.length === 0) return;
     const latestLine = parsed.lines[parsed.lines.length - 1];
-    console.log("UPDATE SENT");
     linesRef.push(latestLine);
   };
 
@@ -76,21 +85,12 @@ export default function Canvas() {
     linesRef.set(null);
   };
 
-  const sendUndo = () => {
-    linesRef.limitToLast(1).once("value", (snapshot) => {
-      if (!snapshot.val()) return;
-      db.ref(
-        `boards/${currentBoard()}/lines/${Object.keys(snapshot.val())[0]}`
-      ).remove();
-    });
-  };
-
-  const classes = useStyles();
-  const ref = React.useRef();
-  const [brushColor, setColor] = React.useState(colors.black);
-  const [brushThickness, setBrushThickness] = React.useState(2);
-  const [lazyBrushEnabled, setLazyBrushEnabled] = React.useState(false);
-  let [updated, setUpdated] = React.useState(false);
+  // This is the hack that lets us send updates on draw
+  if (ref.current && ref.current.canvas.interface) {
+    ref.current.canvas.interface.onmouseup = (e) => {
+      updated = true;
+    };
+  }
 
   const canvas = (
     <CanvasDraw
@@ -98,48 +98,18 @@ export default function Canvas() {
       canvasWidth={"100%"}
       canvasHeight={"100%"}
       loadTimeOffset={0}
+      immediateLoading={true}
       lazyRadius={lazyBrushEnabled ? 30 : 0}
       brushColor={brushColor}
       brushRadius={brushThickness}
       onChange={() => {
         if (updated) {
-          console.log("UPDATE ATTEMPT");
           sendUpdate();
-          setUpdated(null);
-        } else {
-          console.log("NOT UPDATED");
+          updated = null;
         }
       }}
     />
   );
-
-  const db = useDatabase();
-  const linesRef = db.ref(`boards/${currentBoard()}/lines`);
-  linesRef.off();
-  linesRef.on("value", (snapshot) => {
-    if (updated == null) {
-      updated = false;
-      return;
-    }
-    const lines = { ...snapshot.val() };
-    console.log("INCOMING VALUE");
-    if (ref.current) {
-      ref.current.loadSaveData(
-        JSON.stringify({
-          lines: Object.keys(lines).map((id) => lines[id]),
-          width: "100%",
-          height: "100%",
-        })
-      );
-    }
-  });
-  // This is the hack that lets us send updates on draw
-  if (ref.current && ref.current.canvas.interface) {
-    ref.current.canvas.interface.onmouseup = (e) => {
-      console.log("MOUSE EVENT");
-      setUpdated(true);
-    };
-  }
   return (
     <>
       <Paper className={classes.canvas} elevation={3}>
@@ -154,7 +124,7 @@ export default function Canvas() {
                   <div
                     className={clsx(classes.circle, classes[color])}
                     onClick={() => {
-                      setUpdated(null);
+                      updated = null;
                       setColor(colors[color]);
                     }}
                   ></div>
@@ -168,7 +138,7 @@ export default function Canvas() {
                   key={thickness}
                   xs={1}
                   onClick={() => {
-                    setUpdated(null);
+                    updated = null;
                     setBrushThickness(thickness);
                   }}
                 >
@@ -189,7 +159,7 @@ export default function Canvas() {
                   <Switch
                     checked={lazyBrushEnabled}
                     onChange={() => {
-                      setUpdated(null);
+                      updated = null;
                       setLazyBrushEnabled(!lazyBrushEnabled);
                     }}
                     name="lazyBrush"
@@ -198,17 +168,6 @@ export default function Canvas() {
                 }
                 label="Lazy Brush"
               />
-            </Grid>
-            <Grid item xs={2}>
-              <Button
-                variant="contained"
-                color="secondary"
-                fullWidth={true}
-                onClick={sendUndo}
-                startIcon={<UndoIcon />}
-              >
-                Undo
-              </Button>
             </Grid>
             <Grid item xs={2}>
               <Button
