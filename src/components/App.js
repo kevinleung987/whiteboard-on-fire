@@ -29,7 +29,6 @@ function App() {
     await auth.signInAnonymously();
     await auth.currentUser.updateProfile({ displayName: name || "" });
     setAuthenticated(true);
-    console.log(auth.currentUser);
   };
 
   const classes = useStyles();

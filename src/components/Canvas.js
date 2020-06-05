@@ -64,12 +64,21 @@ export default function Canvas() {
     const newLine = snapshot.val();
     if (ref.current) {
       updated = false;
+      const oldPoints = ref.current.points;
       ref.current.drawPoints(newLine);
       ref.current.points = newLine.points;
       ref.current.saveLine({
         brushColor: newLine.brushColor,
         brushRadius: newLine.brushRadius,
       });
+      ref.current.points = oldPoints;
+      if (oldPoints.length > 0) {
+        ref.current.drawPoints({
+          points: oldPoints,
+          brushColor,
+          brushRadius: brushThickness,
+        });
+      }
     }
   });
   linesRef.on("child_removed", (snapshot) => {
@@ -86,7 +95,7 @@ export default function Canvas() {
     linesRef.set(null);
   };
 
-  // This is the hack that lets us send updates on draw
+  // Hack that lets us flag which updates are ours
   if (ref.current && ref.current.canvas.interface) {
     ref.current.canvas.interface.onmouseup = (e) => {
       updated = true;
@@ -156,7 +165,10 @@ export default function Canvas() {
               </Button>
             </Grid>
             <Grid item xs={4}>
-              <SliderPicker color={brushColor} onChangeComplete={(c) => setColor(c.hex)} />
+              <SliderPicker
+                color={brushColor}
+                onChangeComplete={(c) => setColor(c.hex)}
+              />
             </Grid>
             {thicknesses.map((thickness) => {
               return (
