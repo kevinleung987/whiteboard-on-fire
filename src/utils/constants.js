@@ -20,3 +20,5 @@ export const colors = {
   grey: "#9e9e9e",
   blueGrey: "#607d8b",
 };
+
+export const thicknesses = [2, 4, 8, 12, 16, 20];

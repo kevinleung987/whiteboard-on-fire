@@ -13,7 +13,7 @@ import React from "react";
 import CanvasDraw from "react-canvas-draw";
 import { useDatabase } from "reactfire";
 
-import { colors } from "./../utils/constants";
+import { colors, thicknesses } from "./../utils/constants";
 import { currentBoard } from "./../utils/firebaseUtils";
 import { SliderPicker } from "react-color";
 
@@ -33,8 +33,7 @@ const styles = {
   },
 };
 
-const thicknesses = [2, 4, 8, 12, 16, 20];
-
+// Add pre-defined colors to styles
 Object.keys(colors).forEach((color) => {
   const colorCode = colors[color];
   styles[color] = { backgroundColor: colorCode };
@@ -48,9 +47,9 @@ export default function Canvas() {
   // State variables
   const ref = React.useRef();
   const [brushColor, setColor] = React.useState(colors.black);
-  const [brushThickness, setBrushThickness] = React.useState(2);
+  const [brushThickness, setBrushThickness] = React.useState(thicknesses[0]);
   const [lazyBrushEnabled, setLazyBrushEnabled] = React.useState(false);
-  let updated = false;
+  let updated = false; // Whether state update comes from self
 
   // RTDB Interaction
   const db = useDatabase();
@@ -64,13 +63,16 @@ export default function Canvas() {
     const newLine = snapshot.val();
     if (ref.current) {
       updated = false;
+      // Stroke points that are currently being drawn - mouse button still held down
       const oldPoints = ref.current.points;
+      // Draw the incoming update
       ref.current.drawPoints(newLine);
       ref.current.points = newLine.points;
       ref.current.saveLine({
         brushColor: newLine.brushColor,
         brushRadius: newLine.brushRadius,
       });
+      // Restore in-progress stroke points
       ref.current.points = oldPoints;
       if (oldPoints.length > 0) {
         ref.current.drawPoints({
@@ -84,6 +86,7 @@ export default function Canvas() {
   linesRef.on("child_removed", (snapshot) => {
     ref.current.clear();
   });
+
   const sendUpdate = () => {
     const parsed = JSON.parse(ref.current.getSaveData());
     if (parsed.lines.length === 0) return;
