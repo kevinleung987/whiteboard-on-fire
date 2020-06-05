@@ -44,12 +44,14 @@ export default function Chat() {
   };
 
   const classes = useStyles();
+  const [message, setMessage] = React.useState("");
+
   const messagesBottomRef = React.useRef();
   const user = useUser();
   const db = useDatabase();
   const messagesRef = db.ref(`boards/${currentBoard()}/messages`);
   const messageChanges = useDatabaseList(messagesRef);
-  const [message, setMessage] = React.useState("");
+
   React.useEffect(
     () => messagesBottomRef.current.scrollIntoView({ behavior: "smooth" }),
     [messageChanges]
@@ -66,12 +68,6 @@ export default function Chat() {
 
             return (
               <ListItem key={snapshot.key}>
-                {/* TODO: Google Profile Icons */}
-                {/* <ListItemAvatar>
-                  <Avatar>
-                    <AccountCircleIcon />
-                  </Avatar>
-                </ListItemAvatar> */}
                 <ListItemText
                   primaryTypographyProps={{ noWrap: true }}
                   primary={content}

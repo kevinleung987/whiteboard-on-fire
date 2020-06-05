@@ -1,10 +1,19 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import CanvasDraw from "react-canvas-draw";
-import { Button, Container, Switch, FormControlLabel, Paper, Grid } from "@material-ui/core";
-import DeleteIcon from '@material-ui/icons/Delete';
-import UndoIcon from '@material-ui/icons/Undo';
+import {
+  Button,
+  Container,
+  Switch,
+  FormControlLabel,
+  Paper,
+  Grid,
+} from "@material-ui/core";
+import DeleteIcon from "@material-ui/icons/Delete";
+import UndoIcon from "@material-ui/icons/Undo";
 import clsx from "clsx";
+import { useDatabase, useDatabaseList } from "reactfire";
+import { currentBoard } from "./../utils/firebaseUtils";
 
 const colors = {
   black: "#444",
@@ -55,23 +64,86 @@ Object.keys(colors).forEach((color) => {
 const useStyles = makeStyles((theme) => ({ ...styles }));
 
 export default function Canvas() {
+  const sendUpdate = () => {
+    const parsed = JSON.parse(ref.current.getSaveData());
+    if (parsed.lines.length === 0) return;
+    const latestLine = parsed.lines[parsed.lines.length - 1];
+    console.log("UPDATE SENT");
+    linesRef.push(latestLine);
+  };
+
+  const sendClear = () => {
+    linesRef.set(null);
+  };
+
+  const sendUndo = () => {
+    linesRef.limitToLast(1).once("value", (snapshot) => {
+      if (!snapshot.val()) return;
+      db.ref(
+        `boards/${currentBoard()}/lines/${Object.keys(snapshot.val())[0]}`
+      ).remove();
+    });
+  };
+
   const classes = useStyles();
   const ref = React.useRef();
   const [brushColor, setColor] = React.useState(colors.black);
   const [brushThickness, setBrushThickness] = React.useState(2);
   const [lazyBrushEnabled, setLazyBrushEnabled] = React.useState(false);
+  let [updated, setUpdated] = React.useState(false);
+
+  const canvas = (
+    <CanvasDraw
+      ref={ref}
+      canvasWidth={"100%"}
+      canvasHeight={"100%"}
+      loadTimeOffset={0}
+      lazyRadius={lazyBrushEnabled ? 30 : 0}
+      brushColor={brushColor}
+      brushRadius={brushThickness}
+      onChange={() => {
+        if (updated) {
+          console.log("UPDATE ATTEMPT");
+          sendUpdate();
+          setUpdated(null);
+        } else {
+          console.log("NOT UPDATED");
+        }
+      }}
+    />
+  );
+
+  const db = useDatabase();
+  const linesRef = db.ref(`boards/${currentBoard()}/lines`);
+  linesRef.off();
+  linesRef.on("value", (snapshot) => {
+    if (updated == null) {
+      updated = false;
+      return;
+    }
+    const lines = { ...snapshot.val() };
+    console.log("INCOMING VALUE");
+    if (ref.current) {
+      ref.current.loadSaveData(
+        JSON.stringify({
+          lines: Object.keys(lines).map((id) => lines[id]),
+          width: "100%",
+          height: "100%",
+        })
+      );
+    }
+  });
+  // This is the hack that lets us send updates on draw
+  if (ref.current && ref.current.canvas.interface) {
+    ref.current.canvas.interface.onmouseup = (e) => {
+      console.log("MOUSE EVENT");
+      setUpdated(true);
+    };
+  }
   return (
     <>
       <Paper className={classes.canvas} elevation={3}>
-        <CanvasDraw
-          ref={ref}
-          canvasWidth={"100%"}
-          canvasHeight={"100%"}
-          lazyRadius={lazyBrushEnabled ? 30 : 0}
-          brushColor={brushColor}
-          brushRadius={brushThickness}
-          onChange={(change) => console.log(change)}
-        />
+        {canvas}
       </Paper>
       <Paper className={classes.options} elevation={3}>
         <Container>
@@ -81,7 +153,10 @@ export default function Canvas() {
                 <Grid item key={color} xs={1}>
                   <div
                     className={clsx(classes.circle, classes[color])}
-                    onClick={() => setColor(colors[color])}
+                    onClick={() => {
+                      setUpdated(null);
+                      setColor(colors[color]);
+                    }}
                   ></div>
                 </Grid>
               );
@@ -92,7 +167,10 @@ export default function Canvas() {
                   item
                   key={thickness}
                   xs={1}
-                  onClick={() => setBrushThickness(thickness)}
+                  onClick={() => {
+                    setUpdated(null);
+                    setBrushThickness(thickness);
+                  }}
                 >
                   <div
                     style={{
@@ -106,35 +184,14 @@ export default function Canvas() {
               );
             })}
             <Grid item xs={2}>
-              <Button
-                variant="contained"
-                color="default"
-                fullWidth={true}
-                onClick={() =>
-                  console.log(ref.current.lazy.getPointerCoordinates())
-                }
-              >
-                DEBUG:POINTER
-              </Button>
-            </Grid>
-            <Grid item xs={2}>
-              <Button
-                variant="contained"
-                color="default"
-                fullWidth={true}
-                onClick={() =>
-                  console.log(JSON.parse(ref.current.getSaveData()))
-                }
-              >
-                DEBUG:SAVE
-              </Button>
-            </Grid>
-            <Grid item xs={2}>
               <FormControlLabel
                 control={
                   <Switch
                     checked={lazyBrushEnabled}
-                    onChange={() => setLazyBrushEnabled(!lazyBrushEnabled)}
+                    onChange={() => {
+                      setUpdated(null);
+                      setLazyBrushEnabled(!lazyBrushEnabled);
+                    }}
                     name="lazyBrush"
                     color="primary"
                   />
@@ -147,7 +204,7 @@ export default function Canvas() {
                 variant="contained"
                 color="secondary"
                 fullWidth={true}
-                onClick={() => ref.current.undo()}
+                onClick={sendUndo}
                 startIcon={<UndoIcon />}
               >
                 Undo
@@ -158,7 +215,7 @@ export default function Canvas() {
                 variant="contained"
                 color="primary"
                 fullWidth={true}
-                onClick={() => ref.current.clear()}
+                onClick={sendClear}
                 startIcon={<DeleteIcon />}
               >
                 Clear
