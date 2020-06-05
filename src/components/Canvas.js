@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import CanvasDraw from "react-canvas-draw";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-import { Button, Container } from "@material-ui/core";
+import { Button, Container, Switch, FormControlLabel } from "@material-ui/core";
 import clsx from "clsx";
 
 const colors = {
@@ -58,7 +58,8 @@ export default function Canvas() {
   const classes = useStyles();
   const ref = React.useRef();
   const [brushColor, setColor] = React.useState(colors.black);
-  const [brushThickness, setBrushThickness] = React.useState(12);
+  const [brushThickness, setBrushThickness] = React.useState(2);
+  const [lazyBrushEnabled, setLazyBrushEnabled] = React.useState(false);
   return (
     <>
       <Paper className={classes.canvas} elevation={3}>
@@ -66,6 +67,7 @@ export default function Canvas() {
           ref={ref}
           canvasWidth={"100%"}
           canvasHeight={"100%"}
+          lazyRadius={lazyBrushEnabled ? 30 : 0}
           brushColor={brushColor}
           brushRadius={brushThickness}
           onChange={(change) => console.log(change)}
@@ -126,6 +128,19 @@ export default function Canvas() {
               >
                 DEBUG:SAVE
               </Button>
+            </Grid>
+            <Grid item xs={2}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={lazyBrushEnabled}
+                    onChange={() => setLazyBrushEnabled(!lazyBrushEnabled)}
+                    name="lazyBrush"
+                    color="primary"
+                  />
+                }
+                label="Lazy Brush"
+              />
             </Grid>
             <Grid item xs={2}>
               <Button

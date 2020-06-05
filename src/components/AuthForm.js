@@ -47,13 +47,18 @@ export default function AuthForm(props) {
         <>
           <Typography>
             Welcome, {user.displayName}
-            <Button color="inherit" onClick={handleSignout}>
+            <Button
+              style={{marginLeft: 16}}
+              variant="contained"
+              color="secondary"
+              onClick={handleSignout}
+            >
               Sign Out
             </Button>
           </Typography>
         </>
       ) : (
-        <Button color="inherit" onClick={handleClickOpen}>
+        <Button variant="contained" color="secondary" onClick={handleClickOpen}>
           Login
         </Button>
       )}
