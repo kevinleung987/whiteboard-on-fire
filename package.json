@@ -8,6 +8,7 @@
     "firebase": "^7.14.6",
     "react": "^16.13.1",
     "react-canvas-draw": "^1.1.1",
+    "react-color": "^2.18.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
     "reactfire": "^2.0.3"

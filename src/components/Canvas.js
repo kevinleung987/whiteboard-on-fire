@@ -15,6 +15,7 @@ import { useDatabase } from "reactfire";
 
 import { colors } from "./../utils/constants";
 import { currentBoard } from "./../utils/firebaseUtils";
+import { SliderPicker } from "react-color";
 
 const styles = {
   canvas: {
@@ -32,7 +33,7 @@ const styles = {
   },
 };
 
-const thicknesses = [2, 4, 8, 12];
+const thicknesses = [2, 4, 8, 12, 16, 20];
 
 Object.keys(colors).forEach((color) => {
   const colorCode = colors[color];
@@ -99,7 +100,9 @@ export default function Canvas() {
       canvasHeight={"100%"}
       loadTimeOffset={0}
       immediateLoading={true}
+      hideGrid={true}
       lazyRadius={lazyBrushEnabled ? 30 : 0}
+      catenaryColor={brushColor}
       brushColor={brushColor}
       brushRadius={brushThickness}
       onChange={() => {
@@ -131,6 +134,30 @@ export default function Canvas() {
                 </Grid>
               );
             })}
+            <Grid item xs={2}>
+              <Button
+                variant="contained"
+                color="default"
+                fullWidth={true}
+                onClick={() => setColor("white")}
+              >
+                Eraser
+              </Button>
+            </Grid>
+            <Grid item xs={2}>
+              <Button
+                variant="contained"
+                color="secondary"
+                fullWidth={true}
+                onClick={sendClear}
+                startIcon={<DeleteIcon />}
+              >
+                Clear
+              </Button>
+            </Grid>
+            <Grid item xs={4}>
+              <SliderPicker color={brushColor} onChangeComplete={(c) => setColor(c.hex)} />
+            </Grid>
             {thicknesses.map((thickness) => {
               return (
                 <Grid
@@ -145,8 +172,8 @@ export default function Canvas() {
                   <div
                     style={{
                       borderRadius: "50%",
-                      height: thickness * 3,
-                      width: thickness * 3,
+                      height: thickness * 2,
+                      width: thickness * 2,
                       backgroundColor: brushColor,
                     }}
                   ></div>
@@ -168,17 +195,6 @@ export default function Canvas() {
                 }
                 label="Lazy Brush"
               />
-            </Grid>
-            <Grid item xs={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                fullWidth={true}
-                onClick={sendClear}
-                startIcon={<DeleteIcon />}
-              >
-                Clear
-              </Button>
             </Grid>
           </Grid>
         </Container>
