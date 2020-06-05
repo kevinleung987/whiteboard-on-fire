@@ -23,7 +23,7 @@ export default function Presence() {
   const statusChanges = useDatabaseList(allStatusRef);
   ownStatusRef
     .onDisconnect()
-    .set({ name: user.displayName, board: "offline" })
+    .remove()
     .then(() => {
       ownStatusRef.set({ name: user.displayName, board: currentBoard() });
     });

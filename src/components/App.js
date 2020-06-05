@@ -47,12 +47,10 @@ function App() {
   const boardUserCount = {};
   statusChanges.forEach(({ snapshot }) => {
     const { board } = snapshot.val();
-    if (board !== "offline") {
-      if (boardUserCount[board]) {
-        boardUserCount[board] += 1;
-      } else {
-        boardUserCount[board] = 1;
-      }
+    if (boardUserCount[board]) {
+      boardUserCount[board] += 1;
+    } else {
+      boardUserCount[board] = 1;
     }
   });
   return (
@@ -137,7 +135,16 @@ function App() {
                     {Object.keys(boardUserCount).map((board) => {
                       return (
                         <div key={board}>
-                          {`${board}: ${boardUserCount[board]}`}
+                          {`${board}: ${boardUserCount[board]} user${
+                            boardUserCount[board] > 1 ? "s" : ""
+                          }`}
+                          <Button
+                            color="primary"
+                            disabled={currentBoard() === board}
+                            onClick={() => (window.location = board)}
+                          >
+                            {currentBoard() === board ? "Current" : "Join"}
+                          </Button>
                         </div>
                       );
                     })}
