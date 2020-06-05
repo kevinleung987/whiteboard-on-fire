@@ -1,20 +1,19 @@
 import {
-  Grid,
-  Avatar,
   Button,
+  Grid,
   Input,
   List,
   ListItem,
-  ListItemAvatar,
   ListItemText,
   Paper,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import SendIcon from "@material-ui/icons/Send";
 import React from "react";
 import { useDatabase, useDatabaseList, useUser } from "reactfire";
+
 import { currentBoard } from "./../utils/firebaseUtils";
-import Presence from './Presence';
+import Presence from "./Presence";
 
 const useStyles = makeStyles((theme) => ({
   chat: {
@@ -67,11 +66,12 @@ export default function Chat() {
 
             return (
               <ListItem key={snapshot.key}>
-                <ListItemAvatar>
+                {/* TODO: Google Profile Icons */}
+                {/* <ListItemAvatar>
                   <Avatar>
                     <AccountCircleIcon />
                   </Avatar>
-                </ListItemAvatar>
+                </ListItemAvatar> */}
                 <ListItemText
                   primaryTypographyProps={{ noWrap: true }}
                   primary={content}
@@ -98,9 +98,11 @@ export default function Chat() {
             <Button
               color="primary"
               disabled={message.length === 0}
+              style={{ backgroundColor: "transparent" }}
               onClick={() => sendMessage(message)}
+              startIcon={<SendIcon />}
             >
-              Send
+              {" "}
             </Button>
           </Grid>
         </Grid>

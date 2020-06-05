@@ -1,9 +1,9 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import CanvasDraw from "react-canvas-draw";
-import Paper from "@material-ui/core/Paper";
-import Grid from "@material-ui/core/Grid";
-import { Button, Container, Switch, FormControlLabel } from "@material-ui/core";
+import { Button, Container, Switch, FormControlLabel, Paper, Grid } from "@material-ui/core";
+import DeleteIcon from '@material-ui/icons/Delete';
+import UndoIcon from '@material-ui/icons/Undo';
 import clsx from "clsx";
 
 const colors = {
@@ -148,6 +148,7 @@ export default function Canvas() {
                 color="secondary"
                 fullWidth={true}
                 onClick={() => ref.current.undo()}
+                startIcon={<UndoIcon />}
               >
                 Undo
               </Button>
@@ -158,6 +159,7 @@ export default function Canvas() {
                 color="primary"
                 fullWidth={true}
                 onClick={() => ref.current.clear()}
+                startIcon={<DeleteIcon />}
               >
                 Clear
               </Button>

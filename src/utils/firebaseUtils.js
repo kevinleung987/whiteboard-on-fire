@@ -1,9 +1,7 @@
-import firebase from "firebase";
+import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../config/firebaseConfig";
 
-firebase.initializeApp(firebaseConfig);
-export const auth = firebase.auth;
-export const db = firebase.database();
+initializeApp(firebaseConfig);
 export const currentBoard = () => {
   const pathname = window.location.pathname.slice(
     1,

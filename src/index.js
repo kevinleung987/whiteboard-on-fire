@@ -1,13 +1,13 @@
-import './index.css';
+import "./index.css";
 
-import CircularProgress from '@material-ui/core/CircularProgress';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { FirebaseAppProvider, SuspenseWithPerf } from 'reactfire';
+import CircularProgress from "@material-ui/core/CircularProgress";
+import React from "react";
+import ReactDOM from "react-dom";
+import { FirebaseAppProvider, SuspenseWithPerf } from "reactfire";
 
-import App from './components/App';
-import { firebaseConfig } from './config/firebaseConfig';
-import * as serviceWorker from './serviceWorker';
+import App from "./components/App";
+import { firebaseConfig } from "./config/firebaseConfig";
+import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
   <FirebaseAppProvider firebaseConfig={firebaseConfig}>
