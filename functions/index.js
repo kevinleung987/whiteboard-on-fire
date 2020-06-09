@@ -7,7 +7,9 @@ exports.cleanup = functions.database
   .ref("status/")
   .onDelete(async (snapshot, context) => {
     const original = snapshot.val();
-    const originalBoard = original[Object.keys(original)[0]]["board"];
+    const uid = Object.keys(original)[0];
+    const originalBoard = original[uid]["board"];
+    console.log("Removing user:", uid);
     await admin
       .database()
       .ref("status/")
@@ -24,14 +26,19 @@ exports.cleanup = functions.database
               }
             });
             admin.database().ref(`boards/${originalBoard}`).remove();
-            console.log(`Removed ${originalBoard}`);
+            console.log(`Removed board: ${originalBoard}`);
             return true;
           } else {
             admin.database().ref(`boards/${originalBoard}`).remove();
-            console.log(`Removed ${originalBoard}`);
+            console.log(`Removed board: ${originalBoard}`);
           }
         },
         (error) => console.log("Failure", error.code)
       );
+    try {
+      await admin.auth().deleteUser(uid);
+    } catch (e) {
+      console.error("Error deleting user:", e);
+    }
     return true;
   });

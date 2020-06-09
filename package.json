@@ -1,11 +1,12 @@
 {
-  "name": "firebase-firstweek",
+  "name": "whiteboard-on-fire",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.10.1",
     "@material-ui/icons": "^4.9.1",
     "firebase": "^7.14.6",
+    "lz-string": "^1.4.4",
     "react": "^16.13.1",
     "react-canvas-draw": "^1.1.1",
     "react-color": "^2.18.1",
@@ -14,7 +15,7 @@
     "reactfire": "^2.0.3"
   },
   "scripts": {
-    "emulator": "firebase emulators:start",
+    "emulator": "firebase emulators:start --only database",
     "deploy": "yarn build && firebase deploy",
     "start": "react-scripts start",
     "build": "react-scripts build",

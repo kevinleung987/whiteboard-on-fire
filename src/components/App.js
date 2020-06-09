@@ -2,13 +2,14 @@ import {
   Button,
   Container,
   Grid,
+  Link,
   Paper,
   TextField,
   Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import React from "react";
-import { useAuth, useUser, useDatabase, useDatabaseList } from "reactfire";
+import { useAuth, useDatabase, useDatabaseList, useUser } from "reactfire";
 
 import { currentBoard } from "./../utils/firebaseUtils";
 import Canvas from "./Canvas";
@@ -21,6 +22,15 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     padding: 16,
+  },
+  footer: {
+    position: "fixed",
+    left: 0,
+    bottom: 0,
+    width: "100%",
+    backgroundColor: "black",
+    color: "white",
+    textAlign: "center",
   },
 }));
 
@@ -155,6 +165,16 @@ function App() {
           </Grid>
         </Container>
       )}
+      <div className={classes.footer}>
+        <Typography>
+          Created with <Link href="https://firebase.google.com/">Firebase</Link>
+          . Check out the source code{" "}
+          <Link href="https://github.com/kevinleung987/whiteboard-on-fire">
+            here
+          </Link>
+          .
+        </Typography>
+      </div>
     </>
   );
 }

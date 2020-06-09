@@ -16,6 +16,7 @@ import { useDatabase } from "reactfire";
 import { colors, thicknesses } from "./../utils/constants";
 import { currentBoard } from "./../utils/firebaseUtils";
 import { SliderPicker } from "react-color";
+import * as LZString from 'lz-string';
 
 const styles = {
   canvas: {
@@ -25,6 +26,7 @@ const styles = {
   options: {
     marginTop: 16,
     width: "100%",
+    backgroundColor: "grey"
   },
   circle: {
     width: 40,
@@ -60,7 +62,9 @@ export default function Canvas() {
       updated = false;
       return;
     }
-    const newLine = snapshot.val();
+    const compressed = snapshot.val();
+    const decompressed = LZString.decompressFromUTF16(compressed);
+    const newLine = JSON.parse(decompressed);
     if (ref.current) {
       updated = false;
       // Stroke points that are currently being drawn - mouse button still held down
@@ -91,11 +95,13 @@ export default function Canvas() {
     const parsed = JSON.parse(ref.current.getSaveData());
     if (parsed.lines.length === 0) return;
     const latestLine = parsed.lines[parsed.lines.length - 1];
-    linesRef.push(latestLine);
+    const compressed = LZString.compressToUTF16(JSON.stringify(latestLine))
+    linesRef.push(compressed);
   };
 
   const sendClear = () => {
     linesRef.set(null);
+    ref.current.clear();
   };
 
   // Hack that lets us flag which updates are ours
@@ -113,7 +119,7 @@ export default function Canvas() {
       loadTimeOffset={0}
       immediateLoading={true}
       hideGrid={true}
-      lazyRadius={lazyBrushEnabled ? 30 : 0}
+      lazyRadius={lazyBrushEnabled ? 20 : 0}
       catenaryColor={brushColor}
       brushColor={brushColor}
       brushRadius={brushThickness}
