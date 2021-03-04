@@ -1,7 +1,7 @@
 # Whiteboard on Fire(base)
 Collaborative real-time whiteboarding app built on Firebase for my first-week project on the Firebase team at Google.
 
-You can check it out [here](https://wbof.kevinleung.dev/).
+You can check it out [here](https://wbof.kevinleung.net/).
 
 ![](preview.gif?raw=true)
 
